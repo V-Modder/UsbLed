@@ -10,7 +10,8 @@
 #define REQUEST_BRIGHTNESS 1
 #define REQUEST_MODE 2
 
-#define MODE_STATIC_FILL 1
+#define MODE_OFF 1
+#define MODE_STATIC_FILL 2
 #define MODE_DYNAMIC_PATTERN 3
 
 #define EFFECT_CLEAR 1
@@ -65,6 +66,18 @@ void runEffect()
     effect->runStep();
 }
 
+void runInitSequence()
+{
+    Serial.println("Starting init sequence");
+    RainbowSwirl swirl = RainbowSwirl(leds, NUM_LEDS, true);
+    swirl.start();
+    for (int i = 0; i < 500; i++)
+    {
+        delay(10);
+        swirl.runStep();
+    }
+}
+
 void setup()
 {
     FastLED.addLeds<LED_TYPE, LED_PIN, GRB>(leds, NUM_LEDS);
@@ -82,49 +95,21 @@ void setup()
 
     Serial.println("Clear");
     FastLED.clear();
+    FastLED.show();
 
-    //for (unsigned int i = 0; i < EEPROM.length(); i++)
+    // for (unsigned int i = 0; i < EEPROM.length(); i++)
     //{
-    //    EEPROM.write(i, 0);
+    //     EEPROM.write(i, 0);
+    // }
+
+    // Serial.println("EEPROM cleared");
+    // while (true)
+    //{
     //}
 
-    //Serial.println("EEPROM cleared");
-    //while (true)
-    //{
-    //}
-
-    RainbowSwirl swirl = RainbowSwirl(leds, NUM_LEDS, true);
-    swirl.start();
-    for (int i = 0; i < 500; i++)
-    {
-        delay(10);
-        swirl.runStep();
-    }
-
-    Serial.println("Starting init sequence");
-
-    switch (EEPROM.read(EEPROM_MODE))
-    {
-    case MODE_STATIC_FILL:
-        CRGB color;
-        color.red = EEPROM.read(EEPROM_DATA_1);
-        color.green = EEPROM.read(EEPROM_DATA_2);
-        color.blue = EEPROM.read(EEPROM_DATA_3);
-        fill_solid(leds, NUM_LEDS, color);
-        mode = MODE_STATIC_FILL;
-        effect = NULL;
-        break;
-    case MODE_DYNAMIC_PATTERN:
-        setEffect(EEPROM.read(EEPROM_DATA_1));
-        effect->start();
-        mode = MODE_DYNAMIC_PATTERN;
-        break;
-    default:
-        Serial.println("No value present...using default");
-        fill_solid(leds, NUM_LEDS, CRGB::Blue);
-        FastLED.show();
-        mode = MODE_STATIC_FILL;
-    }
+    runInitSequence();
+    FastLED.clear();
+    FastLED.show();
 
     Serial.println("Starup done");
 }
@@ -162,10 +147,6 @@ void readCommand()
             EEPROM.write(EEPROM_MODE, mode);
             EEPROM.write(EEPROM_DATA_1, effectId);
             break;
-            // default:
-            //  Serial.println("No value present...using default");
-            //  fill_solid(leds, NUM_LEDS, CRGB::Blue);
-            //  mode = MODE_STATIC_FILL;
         }
     }
 }
@@ -177,7 +158,38 @@ void loop()
         readCommand();
     }
 
-    if (mode == MODE_DYNAMIC_PATTERN)
+    if (mode == MODE_OFF && isVinConnected())
+    {
+        switch (EEPROM.read(EEPROM_MODE))
+        {
+        case MODE_STATIC_FILL:
+            CRGB color;
+            color.red = EEPROM.read(EEPROM_DATA_1);
+            color.green = EEPROM.read(EEPROM_DATA_2);
+            color.blue = EEPROM.read(EEPROM_DATA_3);
+            fill_solid(leds, NUM_LEDS, color);
+            mode = MODE_STATIC_FILL;
+            effect = NULL;
+            break;
+        case MODE_DYNAMIC_PATTERN:
+            setEffect(EEPROM.read(EEPROM_DATA_1));
+            effect->start();
+            mode = MODE_DYNAMIC_PATTERN;
+            break;
+        default:
+            Serial.println("No value present...using default");
+            fill_solid(leds, NUM_LEDS, CRGB::Blue);
+            FastLED.show();
+            mode = MODE_STATIC_FILL;
+        }
+    }
+    else if (mode != MODE_OFF && !isVinConnected())
+    {
+        mode = MODE_OFF;
+        FastLED.clear();
+        FastLED.show();
+    }
+    else if (mode == MODE_DYNAMIC_PATTERN)
     {
         runEffect();
     }
