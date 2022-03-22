@@ -95,9 +95,9 @@ void setup()
 
     RainbowSwirl swirl = RainbowSwirl(leds, NUM_LEDS, true);
     swirl.start();
-    for (int i = 0; i < 30; i++)
+    for (int i = 0; i < 500; i++)
     {
-        delay(100);
+        delay(10);
         swirl.runStep();
     }
 
@@ -122,6 +122,7 @@ void setup()
     default:
         Serial.println("No value present...using default");
         fill_solid(leds, NUM_LEDS, CRGB::Blue);
+        FastLED.show();
         mode = MODE_STATIC_FILL;
     }
 
@@ -181,7 +182,7 @@ void loop()
         runEffect();
     }
 
-    delay(100);
+    delay(10);
 
     // put your main code here, to run repeatedly:
     /*

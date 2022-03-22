@@ -8,19 +8,26 @@ public:
 private:
     bool forward;
     byte initialHue;
+    byte iteration;
+    void fillRainbow(byte initialHue);
 };
 
 RainbowSwirl::RainbowSwirl(CRGB* leds, byte count, bool forward) : Animation(leds, count) {
     this->forward = forward;
     this->initialHue = 0;
+    this->iteration = 0;
 }
 
 void RainbowSwirl::start() {
-    fill_rainbow(leds, ledCount, 0, 255 / ledCount);
-    FastLED.show();
+    fillRainbow(0);
 }
 
 void RainbowSwirl::runStep() {
+    iteration += 1;
+    if(iteration % 2 != 0) {
+        return;
+    }
+
     if(forward) {
         if(initialHue == 254) {
             initialHue = 0;    
@@ -37,7 +44,21 @@ void RainbowSwirl::runStep() {
             initialHue--;
         }
     }
+    
+    fillRainbow(initialHue);
+}
 
-    fill_rainbow(leds, ledCount, initialHue, 255 / ledCount);
+void RainbowSwirl::fillRainbow(byte initialHue) {
+    byte deltaHue = 255 / ledCount;
+    CHSV hsv;
+    hsv.hue = initialHue;
+    hsv.val = 128;
+    hsv.sat = 240;
+
+    for(int i = 0; i < ledCount; ++i) {
+        leds[i] = hsv;
+        hsv.hue += deltaHue;
+    }
+
     FastLED.show();
 }
