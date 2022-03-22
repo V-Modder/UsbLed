@@ -1,4 +1,4 @@
-#include "effects/Animation.h"
+#include "effects/Animation.hpp"
 
 class Clear : public Animation {
 public:

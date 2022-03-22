@@ -1,4 +1,4 @@
-#include "effects/Animation.h"
+#include "effects/Animation.hpp"
 
 class RainbowSwirl : public Animation {
 public:
@@ -37,7 +37,7 @@ void RainbowSwirl::runStep() {
             initialHue--;
         }
     }
-    
+
     fill_rainbow(leds, ledCount, initialHue, 255 / ledCount);
     FastLED.show();
 }

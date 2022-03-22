@@ -2,7 +2,7 @@
 #include <FastLED.h>
 #include <EEPROM.h>
 
-#include "effects/Animation.h"
+#include "effects/Animation.hpp"
 #include "effects/Clear.hpp"
 #include "effects/Rainbow.hpp"
 #include "effects/RainbowSwirl.hpp"
@@ -83,15 +83,15 @@ void setup()
     Serial.println("Clear");
     FastLED.clear();
 
-    for (unsigned int i = 0; i < EEPROM.length(); i++)
-    {
-        EEPROM.write(i, 0);
-    }
+    //for (unsigned int i = 0; i < EEPROM.length(); i++)
+    //{
+    //    EEPROM.write(i, 0);
+    //}
 
-    Serial.println("EEPROM cleared");
-    while (true)
-    {
-    }
+    //Serial.println("EEPROM cleared");
+    //while (true)
+    //{
+    //}
 
     RainbowSwirl swirl = RainbowSwirl(leds, NUM_LEDS, true);
     swirl.start();

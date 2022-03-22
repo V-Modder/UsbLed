@@ -5,8 +5,8 @@
 class Animation {
 public:
     Animation(CRGB* leds, byte count);
-    void start();
-    void runStep();
+    virtual void start();
+    virtual void runStep();
 protected:
     CRGB* leds;
     byte ledCount;
