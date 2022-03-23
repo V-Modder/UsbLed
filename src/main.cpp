@@ -61,6 +61,12 @@ void setEffect(byte id)
     }
 }
 
+void clear()
+{
+    FastLED.clear();
+    FastLED.show();
+}
+
 void runEffect()
 {
     effect->runStep();
@@ -83,6 +89,8 @@ void setup()
     FastLED.addLeds<LED_TYPE, LED_PIN, GRB>(leds, NUM_LEDS);
     Serial.begin(9600);
 
+    Serial.println(analogRead(VIN_INPUT_PIN));
+
     byte initBrightness = EEPROM.read(EEPROM_BRIGHTNESS);
     if (initBrightness != 0)
     {
@@ -94,8 +102,7 @@ void setup()
     }
 
     Serial.println("Clear");
-    FastLED.clear();
-    FastLED.show();
+    clear();
 
     // for (unsigned int i = 0; i < EEPROM.length(); i++)
     //{
@@ -108,8 +115,8 @@ void setup()
     //}
 
     runInitSequence();
-    FastLED.clear();
-    FastLED.show();
+    clear();
+    mode = MODE_OFF;
 
     Serial.println("Starup done");
 }
@@ -149,6 +156,10 @@ void readCommand()
             break;
         }
     }
+    else
+    {
+        Serial.println(analogRead(VIN_INPUT_PIN));
+    }
 }
 
 void loop()
@@ -160,6 +171,8 @@ void loop()
 
     if (mode == MODE_OFF && isVinConnected())
     {
+        runInitSequence();
+        Serial.println("Returning state");
         switch (EEPROM.read(EEPROM_MODE))
         {
         case MODE_STATIC_FILL:
@@ -186,8 +199,8 @@ void loop()
     else if (mode != MODE_OFF && !isVinConnected())
     {
         mode = MODE_OFF;
-        FastLED.clear();
-        FastLED.show();
+        clear();
+        Serial.println("Mode off");
     }
     else if (mode == MODE_DYNAMIC_PATTERN)
     {
@@ -225,8 +238,7 @@ void loop()
 
     Serial.println("Clear");
     digitalWrite(LED_BUILTIN, LOW);
-    FastLED.clear();
-    FastLED.show();
+    clear()
     delay(3000);
     */
 }
