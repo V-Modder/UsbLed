@@ -2,6 +2,7 @@
 #include <FastLED.h>
 #include <EEPROM.h>
 
+#include "serial/serial.hpp"
 #include "effects/Animation.hpp"
 #include "effects/Clear.hpp"
 #include "effects/Rainbow.hpp"
@@ -9,6 +10,10 @@
 
 #define REQUEST_BRIGHTNESS 1
 #define REQUEST_MODE 2
+#define REQUEST_ID 3
+#define REQUEST_STATUS 4
+
+#define CONTROLLER_ID 151544
 
 #define MODE_OFF 1
 #define MODE_STATIC_FILL 2
@@ -155,6 +160,24 @@ void readCommand()
             EEPROM.write(EEPROM_DATA_1, effectId);
             break;
         }
+    }
+    else if(request == REQUEST_ID) {
+        writeInt(CONTROLLER_ID);
+    }
+    else if(request == REQUEST_STATUS) {
+        Status status;
+        Color color;
+        //color.RED = ;
+        //color.GREEN;
+        //color.BLUE;
+        Color eepromColor;
+        eepromColor
+
+        status.MODE = mode;
+        status.BRIGHTNESS = FastLED.getBrightness();
+        status.COLOR = color;
+
+
     }
     else
     {
